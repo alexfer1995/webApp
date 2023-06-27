@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<head>
+	<title>Search</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/static/estilos.css" />
+</head>
+
+<body>
+	
+	<header>
+		<nav>
+			<ul>
+			<li><a href="index">Main</a></li>
+			<li><a href="entry">Search</a></li>
+			<li><a href="viewlog">View Log</a></li>
+			<li><a href="stats">Stats</a></li>
+			<li><a href="login">Login</a></li>
+			<img src="{{user_image}}" width="130" height="90">
+			</ul>
+		</nav>
+
+	</header>
+	
+	<br><br><br></br></br></br>
+
+	<div>
+	
+		<h2>{{ the_title }}</h2>
+
+			<form method="post" action="/search">
+			<table>
+				<p>
+					Use this form to submit a search request:
+				</p>
+				<tr><td>Phrase:</td><td><input name="phrase" type="TEXT" width="60"></td></tr>
+				<tr><td>Letters:</td><td><input name="letters" type="TEXT" value="aeiou"></td></tr>
+			</table>
+			<p>When you are ready, click start button:</p>
+			<p><input value="START" type="SUBMIT"></p>
+			</form>
+	
+	</div>
+</body>
+{% endblock %}

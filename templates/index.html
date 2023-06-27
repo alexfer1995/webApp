@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<title>WebApp</title>
+	<meta charset='utf-8'>
+	<link rel="stylesheet" href="/static/estilos.css"/>
+	<link rel="icon" href="/static/img/icono2.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="/static/img/icono2.ico" type="image/x-icon">
+	<script>
+		function updateTime() {
+			var currentTime = new Date();
+			var hours = currentTime.getHours();
+			var minutes = currentTime.getMinutes();
+			var seconds = currentTime.getSeconds();
+			var formattedTime = hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+			document.getElementById("current-time").textContent = formattedTime;
+		}
+
+		setInterval(updateTime, 1000);
+	</script>
+</head>
+
+<body>
+	<header>
+		<div class="title-container">
+			<img src="{{user_image}}" width="130" height="90">
+			<h1>WebApp</h1>
+		</div>
+		<nav>
+			<ul class="nav">
+				<li><a href="index">Home</a></li>
+				<li><a href="entry">Search</a></li>
+				<li><a href="viewlog">View Log</a></li>
+				<li><a href="stats">Stats</a></li>
+				<li><a href="login">Login</a></li>
+				<li><a href="status">Status</a></li>
+				<li><a href="logout">Exit</a></li>
+			</ul>
+		</nav>
+
+		<div id="current-time"></div>
+	</header>
+				 <section id="youtube-video-section">
+		    <h2>Video de Presentación</h2>
+		    <div class="video-container">
+		      <iframe width="560" height="315" src="https://www.youtube.com/embed/0YjNIjgMo2A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+		    </div>
+		 </section>
+
+</body>
+</html>

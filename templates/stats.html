@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<head>
+	<title>Stats</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/static/estilos.css" />
+</head>
+
+<body>
+	<header>
+		<nav>
+			<ul>
+			<li><a href="index">Main</a></li>
+			<li><a href="entry">Search</a></li>
+			<li><a href="viewlog">View Log</a></li>
+			<li><a href="stats">Stats</a></li>
+			<li><a href="login">Login</a></li>
+			<img src="{{user_image}}" width="130" height="90">
+			</ul>
+		</nav>
+
+	</header>
+	
+	<br><br><br></br></br></br>
+	<div>
+
+		<h3>General stats</h3>
+		<table>
+			<tr><td>How many requests has been responded to?</td><td>{{ n_request }}</td></tr>
+			<tr><td>What's the most common list of letters?</td><td>{{ common_letters }}</td></tr>
+			<tr><td>Which IP addresses are the request coming from?</td><td>{{ ip_addr }}</td></tr>
+
+		</table>
+
+		<h3>User stats</h3>
+		<table>
+			<tr><td>How many requests has been responded to?</td><td>{{ n_request1 }}</td></tr>
+			<tr><td>What's the most common list of letters?</td><td>{{ common_letters1 }}</td></tr>
+			<tr><td>Which IP addresses are the request coming from?</td><td>{{ ip_addr1 }}</td></tr>
+
+		</table>
+
+		<h3>Anonymous searches: {{ n_anonimo }}</h3>
+
+		<h3>Top 5 Users</h3>
+		<table>
+			<tr><th>User name</th><th>Visits</th></tr>
+			<tr><td>{{ rows[0][0] }}</td><td>{{ rows[0][1] }}</td></tr>
+			<tr><td>{{ rows[1][0] }}</td><td>{{ rows[1][1] }}</td></tr>
+			<tr><td>{{ rows[2][0] }}</td><td>{{ rows[2][1] }}</td></tr>
+			<tr><td>{{ rows[3][0] }}</td><td>{{ rows[3][1] }}</td></tr>
+			<tr><td>{{ rows[4][0] }}</td><td>{{ rows[4][1] }}</td></tr>
+		</table>
+
+		<h3>Top 5 Words</h3>
+		<table>
+			<tr><th>Word</th><th>Searches</th></tr>
+			<tr><td>{{ words[0][0] }}</td><td>{{ words[0][1] }}</td></tr>
+			<tr><td>{{ words[1][0] }}</td><td>{{ words[1][1] }}</td></tr>
+			<tr><td>{{ words[2][0] }}</td><td>{{ words[2][1] }}</td></tr>
+			<tr><td>{{ words[3][0] }}</td><td>{{ words[3][1] }}</td></tr>
+			<tr><td>{{ words[4][0] }}</td><td>{{ words[4][1] }}</td></tr>
+		</table>
+
+	</div>
+</body>
+{% endblock %}

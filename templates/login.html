@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<title>WebApp</title>
+	<meta charset='utf-8'>
+	<link rel="stylesheet" href="/static/estilos.css"/>
+	<link rel="icon" href="/static/icono2.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="/static/icono2.ico" type="image/x-icon">
+	<script>
+		function updateTime() {
+			var currentTime = new Date();
+			var hours = currentTime.getHours();
+			var minutes = currentTime.getMinutes();
+			var seconds = currentTime.getSeconds();
+			var formattedTime = hours + ":" + minutes + ":" + seconds;
+			document.getElementById("current-time").textContent = formattedTime;
+		}
+
+		setInterval(updateTime, 1000);
+	</script>
+</head>
+
+<body>
+	<header>
+		<div class="title-container">
+			<img src="{{user_image}}" width="130" height="90">
+			<h1>WebApp</h1>
+
+		</div>
+		<nav>
+			<ul class="nav">
+				<li><a href="index">Home</a></li>
+				<li><a href="entry">Search</a></li>
+				<li><a href="viewlog">View Log</a></li>
+				<li><a href="stats">Stats</a></li>
+				<li><a href="login">Login</a></li>
+				<li><a href="status">Status</a></li>
+				<li><a href="logout">Exit</a></li>
+			</ul>
+		</nav>
+		<div id="current-time"></div>
+	</header>
+	<br><br><br></br></br></br>
+	<div>
+		<h2>{{ the_title }}</h2>
+
+
+			<td>
+				<form method="post" action="/log">
+				<table>
+					<p>
+						Enter your credentials (you can use 'anonimo' too):
+					</p>
+					<tr><td>User name:</td><td><input name="user_name" type="TEXT" width="60" value = "anonimo"></td></tr>
+					<tr><td>Password:</td><td><input name="password" type="password" value=""></td></tr>
+				</table>
+				<p><input value="Log in" type="SUBMIT"></p>
+				</form>
+			</td>
+
+			<br><br></br></br>
+
+			<td>
+				<form method="post" action="/newuser">
+				<table>
+					<p>
+						Create a new user:
+					</p>
+					<tr><td>New user name:</td><td><input name="new_user_name" type="TEXT" width="60"></td></tr>
+					<tr><td>New password:</td><td><input name="new_password" type="password" value=""></td></tr>
+				</table>
+				<p><input value="Create new user" type="SUBMIT"></p>
+				</form>
+			</td>
+
+	</div>
+</body>
+</html>
