@@ -1,17 +1,27 @@
 import os
 from collections import Counter
 
+import mysql.connector
 from DBcm import UseDatabase, CredentialsError, ConnectionError
-import mysql
-import _mysql_connector
+
 from search4web import search4letters
 from flask import Flask, render_template, request, session
 from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = 'python'
+app.idUsuarios = 0
 
 IMG_FOLDER = os.path.join('static','img')
 app.config['UPLOAD_FOLDER'] = IMG_FOLDER
+app.config['dbconfig'] = {
+    'host': '127.0.0.1',
+    'user': 'root',
+    'password': 'BBDDPython',
+    'database': 'search_log',
+    'auth_plugin': 'mysql_native_password'
+}
+
 
 @app.route('/')
 @app.route('/index')
@@ -34,30 +44,30 @@ def login_page()->'html':
 
 @app.route('/login', methods=['POST'])
 def login():
-    user = request.form['user_name']
+    user = request.form['Nombre']
     passw = request.form['password']
     logged_in = False
     message = ""
 
     with UseDatabase(app.config['dbconfig']) as cursor:
-        _SQL = """select id_user from users1 where user_name = %s and password = %s"""
+        _SQL = """select idUsuarios from usuarios where Nombre = %s and password = %s"""
         cursor.execute(_SQL, (user, passw))
         contents = cursor.fetchall()
 
         if len(contents) == 1:
-            app.id_user = contents[0][0]
+            app.idUsuarios = contents[0][0]
             logged_in = True
         elif user == 'anonimo':
-            _SQL = """insert into users1 (user_name, password) values (%s, %s)"""
+            _SQL = """insert into usuarios (Nombre, password) values (%s, %s)"""
             cursor.execute(_SQL, (user, passw))
-            _SQL = """select id_user from users1 where user_name = %s and password = %s"""
+            _SQL = """select idUsuarios from usuarios where Nombre = %s and password = %s"""
             cursor.execute(_SQL, (user, passw))
             contents = cursor.fetchall()
 
-            app.id_user = contents[0][0]
+            app.idUsuarios = contents[0][0]
 
-            _SQL = """insert into dbvisits1 (id_user, count) values (%s, %s)"""
-            cursor.execute(_SQL, (app.id_user, 1))
+            _SQL = """insert into visitas (idUsuarios, count) values (%s, %s)"""
+            cursor.execute(_SQL, (app.idUsuarios, 1))
 
             logged_in = True
         else:
@@ -72,28 +82,31 @@ def login():
     else:
         return message if message else "La identificación introducida es incorrecta o no existe"
 
+import traceback
+
 @app.route('/newuser', methods=['POST'])
 def createNewUser():
-    user = request.form['new_user_name']
+    user = request.form['new_Nombre']
     passw = request.form['new_password']
     message = ""
 
+
     with UseDatabase(app.config['dbconfig']) as cursor:
-        _SQL = """select id_user from users1 where user_name = %s"""
+        _SQL = """select idUsuarios from usuarios where Nombre = %s"""
         cursor.execute(_SQL, (user,))
         contents = cursor.fetchall()
 
         if len(contents) == 0:
-            _SQL = """insert into users1 (user_name, password) values (%s, %s)"""
+            _SQL = """insert into usuarios (Nombre, password) values (%s, %s)"""
             cursor.execute(_SQL, (user, passw))
-            _SQL = """select id_user from users1 where user_name = %s and password = %s"""
+            _SQL = """select idUsuarios from usuarios where Nombre = %s and password = %s"""
             cursor.execute(_SQL, (user, passw))
             contents = cursor.fetchall()
 
-            app.id_user = contents[0][0]
+            app.idUsuarios = contents[0][0]
 
-            _SQL = """insert into dbvisits1 (id_user, count) values (%s, %s)"""
-            cursor.execute(_SQL, (app.id_user, 1))
+            _SQL = """insert into visitas (idUsuarios, count) values (%s, %s)"""
+            cursor.execute(_SQL, (app.idUsuarios, 1))
 
             session['logged_in'] = True
             current_time = datetime.now().strftime('%H:%M:%S')
@@ -103,7 +116,9 @@ def createNewUser():
         else:
             message = "Este usuario ya está en uso, por favor ingresa un nuevo nombre de usuario"
 
-    return message if message else "Ocurrió un error al crear el usuario"
+            return message if message else "Ocurrió un error al crear el usuario"
+
+
 
 
 @app.route('/entry')
@@ -120,10 +135,10 @@ def do_search() -> str:
     letters = request.form['letters']
     title = 'Here are your results: '
     results = str(search4letters(phrase, letters))
-    id_user = app.id_user
+    idUsuarios = app.idUsuarios
     with UseDatabase(app.config['dbconfig']) as cursor:
-        _SQL = """INSERT INTO log7 (phrase, letters, ip, results, id_user) VALUES (%s, %s, %s, %s, %s)"""
-        cursor.execute(_SQL, (request.form['phrase'], request.form['letters'], request.remote_addr, results, id_user))
+        _SQL = """INSERT INTO log7 (phrase, letters, ip, results, idUsuarios) VALUES (%s, %s, %s, %s, %s)"""
+        cursor.execute(_SQL, (request.form['phrase'], request.form['letters'], request.remote_addr, results, idUsuarios))
     # log_request(request, results)
     return render_template('results.html', the_title=title, the_phrase=phrase, the_letters=letters, the_results=results)
 
@@ -137,9 +152,9 @@ def view_the_log() -> str:
 
 def getTopUsers():
     with UseDatabase(app.config['dbconfig']) as cursor:
-        _SQL = """SELECT users1.user_name, dbvisits1.count
-                  FROM users1
-                  JOIN dbvisits1 ON users1.id_user = dbvisits1.id_user"""
+        _SQL = """SELECT usuarios.Nombre, visitas.count
+                  FROM usuarios
+                  JOIN visitas ON usuarios.idUsuarios = visitas.idUsuarios"""
         cursor.execute(_SQL)
         top_users = cursor.fetchall()
 
@@ -230,23 +245,23 @@ def get_common_ip_addresses(cursor):
 
 
 def get_user_requests(cursor):
-    _SQL = """select count(*) as user_requests from log7 where id_user = %s"""
-    cursor.execute(_SQL, (app.id_user,))
+    _SQL = """select count(*) as user_requests from log7 where idUsuarios = %s"""
+    cursor.execute(_SQL, (app.idUsuarios,))
     result = cursor.fetchone()
     return result['user_requests']
 
 
 def get_user_common_letters(cursor):
-    _SQL = """select letters from log7 where id_user = %s"""
-    cursor.execute(_SQL, (app.id_user,))
+    _SQL = """select letters from log7 where idUsuarios = %s"""
+    cursor.execute(_SQL, (app.idUsuarios,))
     letters = Counter(cursor.fetchall())
     common_letters = letters.most_common()
     return common_letters[0][0][0]
 
 
 def get_user_ip_addresses(cursor):
-    _SQL = """select ip from log7 where id_user = %s"""
-    cursor.execute(_SQL, (app.id_user,))
+    _SQL = """select ip from log7 where idUsuarios = %s"""
+    cursor.execute(_SQL, (app.idUsuarios,))
     ip = Counter(cursor.fetchall())
     common_ip = ip.most_common()
     return common_ip[0][0][0]
@@ -267,6 +282,9 @@ def check_status() -> str:
     if 'logged_in' in session:
         return 'You are currently logged in.'
     return render_template('status.html','You are NOT logged in.')
+
+
+
 
 if __name__ == '__main__':
     # run app in debug mode on port 5000
