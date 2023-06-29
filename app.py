@@ -66,7 +66,7 @@ def login():
 
             app.idUsuarios = contents[0][0]
 
-            _SQL = """insert into visitas (idUsuarios, count) values (%s, %s)"""
+            _SQL = """insert into visitas (idUsuarios, ContadorVisitas) values (%s, %s)"""
             cursor.execute(_SQL, (app.idUsuarios, 1))
 
             logged_in = True
@@ -82,19 +82,20 @@ def login():
     else:
         return message if message else "La identificación introducida es incorrecta o no existe"
 
-import traceback
+
 
 @app.route('/newuser', methods=['POST'])
 def createNewUser():
     user = request.form['new_Nombre']
     passw = request.form['new_password']
     message = ""
-
+    print(user)
 
     with UseDatabase(app.config['dbconfig']) as cursor:
         _SQL = """select idUsuarios from usuarios where Nombre = %s"""
         cursor.execute(_SQL, (user,))
         contents = cursor.fetchall()
+        print(len(contents))
 
         if len(contents) == 0:
             _SQL = """insert into usuarios (Nombre, password) values (%s, %s)"""
@@ -105,7 +106,7 @@ def createNewUser():
 
             app.idUsuarios = contents[0][0]
 
-            _SQL = """insert into visitas (idUsuarios, count) values (%s, %s)"""
+            _SQL = """insert into visitas (idUsuarios, ContadorVisitas) values (%s, %s)"""
             cursor.execute(_SQL, (app.idUsuarios, 1))
 
             session['logged_in'] = True
@@ -152,7 +153,7 @@ def view_the_log() -> str:
 
 def getTopUsers():
     with UseDatabase(app.config['dbconfig']) as cursor:
-        _SQL = """SELECT usuarios.Nombre, visitas.count
+        _SQL = """SELECT usuarios.Nombre, visitas.ContadorVisitas
                   FROM usuarios
                   JOIN visitas ON usuarios.idUsuarios = visitas.idUsuarios"""
         cursor.execute(_SQL)
